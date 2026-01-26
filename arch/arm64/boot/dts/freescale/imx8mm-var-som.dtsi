@@ -69,37 +69,11 @@
 &ecspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi1>;
-	cs-gpios = <&gpio1 14 GPIO_ACTIVE_LOW>,
-		   <&gpio1  0 GPIO_ACTIVE_LOW>;
+	cs-gpios = <&gpio1 3 GPIO_ACTIVE_LOW>,
+			<&gpio1 0 GPIO_ACTIVE_LOW>;
 	/delete-property/ dmas;
 	/delete-property/ dma-names;
 	status = "okay";
-
-	/* Resistive touch controller */
-	touchscreen@0 {
-		reg = <0>;
-		compatible = "ti,ads7846";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_restouch>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
-
-		spi-max-frequency = <1500000>;
-		pendown-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
-
-		ti,x-min = /bits/ 16 <125>;
-		touchscreen-size-x = <4008>;
-		ti,y-min = /bits/ 16 <282>;
-		touchscreen-size-y = <3864>;
-		ti,x-plate-ohms = /bits/ 16 <180>;
-		touchscreen-max-pressure = <255>;
-		touchscreen-average-samples = <10>;
-		ti,debounce-tol = /bits/ 16 <3>;
-		ti,debounce-rep = /bits/ 16 <1>;
-		ti,settle-delay-usec = /bits/ 16 <150>;
-		ti,keep-vref-on;
-		wakeup-source;
-	};
 };
 
 &fec1 {
@@ -320,7 +294,7 @@
 	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
 	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
 	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
-	cd-gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;
+	cd-gpios = <&gpio1 6 GPIO_ACTIVE_LOW>;
 	bus-width = <4>;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
@@ -352,8 +326,8 @@
 			MX8MM_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK		0x13
 			MX8MM_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI		0x13
 			MX8MM_IOMUXC_ECSPI1_MISO_ECSPI1_MISO		0x13
-			MX8MM_IOMUXC_GPIO1_IO14_GPIO1_IO14		0x13
-			MX8MM_IOMUXC_GPIO1_IO00_GPIO1_IO0		0x13
+			MX8MM_IOMUXC_GPIO1_IO14_GPIO1_IO14		    0x13
+			MX8MM_IOMUXC_GPIO1_IO00_GPIO1_IO0	    	0x13
 		>;
 	};
 
