@@ -13,12 +13,13 @@
 
 / {
 	compatible = "variscite,imx8mm-var-som", "fsl,imx8mm";
-	iw612_pwrseq: iw612_pwrseq {
+	brcmf_pwrseq: brcmf_pwrseq {
 		compatible = "mmc-pwrseq-simple";
 		post-power-on-delay-ms = <100>;
 		power-off-delay-us = <10000>;
-		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>,	/* WIFI_RESET */
-			      <&gpio2 20 GPIO_ACTIVE_LOW>;	/* WIFI_PWR_EN */
+		reset-gpios = <&gpio2 7  GPIO_ACTIVE_LOW>,	/* WIFI_3V3_PWR_EN */
+			      <&gpio2 20 GPIO_ACTIVE_LOW>,	/* WIFI_1V8_PWR_EN */
+			      <&gpio2 10 GPIO_ACTIVE_LOW>;	/* WIFI_REG_ON     */
 		status = "okay";
 	};
 
@@ -417,8 +418,13 @@
 	bus-width = <4>;
 	non-removable;
 	keep-power-in-suspend;
-	mmc-pwrseq = <&iw612_pwrseq>;
+	mmc-pwrseq = <&brcmf_pwrseq>;
 	status = "okay";
+
+	brcmf: wifi@1 {
+		reg = <1>;
+		compatible = "brcm,bcm4329-fmac";
+	};
 };
 
 /* EMMC */
@@ -714,6 +720,7 @@
 
 	pinctrl_wifi: wifigrp {
 		fsl,pins = <
+			MX8MM_IOMUXC_SD1_DATA5_GPIO2_IO7		0xc1	/* WIFI_3V3_PWR_EN */
 			MX8MM_IOMUXC_SD2_WP_GPIO2_IO20			0x140	/* WIFI_1V8_PWR_EN */
 			MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10		0xc1	/* WIFI_REG_ON     */
 		>;
