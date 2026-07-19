@@ -15,7 +15,7 @@
 };
 
 &brcmf_pwrseq {
-	status = "disabled";
+	status = "okay";
 };
 
 /* WIFI */
@@ -25,7 +25,7 @@
 	pinctrl-0 = <&pinctrl_usdhc1>, <&pinctrl_wifi>, <&pinctrl_wifi_v1>;
 	pinctrl-1 = <&pinctrl_usdhc1_100mhz>, <&pinctrl_wifi>, <&pinctrl_wifi_v1>;
 	pinctrl-2 = <&pinctrl_usdhc1_200mhz>, <&pinctrl_wifi>, <&pinctrl_wifi_v1>;
-	mmc-pwrseq = <>;
+	mmc-pwrseq = <&brcmf_pwrseq>;
 
 	brcmf: wifi@1 {
 		reg = <1>;
