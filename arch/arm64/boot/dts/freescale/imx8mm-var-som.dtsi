@@ -107,6 +107,13 @@
 		clock-frequency = <40000000>;
 		clock-output-names = "can_osc";
 	};
+
+	can_u25_osc: can_u25_osc {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <40000000>;
+		clock-output-names = "can_u25_osc";
+	};
 };
 
 &A53_0 {
@@ -459,11 +466,24 @@
 &ecspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi1>;
-	cs-gpios = <&gpio1 3 GPIO_ACTIVE_LOW>,
-		   <&gpio1  0 GPIO_ACTIVE_LOW>;
+	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>,
+		   <&gpio1 0 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
-	/* CAN controller */
+	/* CAN controller(Blue[u25]) */
+	can_u25: can@0 {
+		reg = <0>;
+		compatible = "microchip,mcp251xfd";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_can_u25>;
+		clocks = <&can_u25_osc>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
+		spi-max-frequency = <20000000>;
+		status = "okay";
+	};
+
+	/* CAN controller(Red) */
 	can0: can@1 {
 		reg = <1>;
 		compatible = "microchip,mcp251xfd";
@@ -484,7 +504,7 @@
 		reg = <2>;
 		compatible = "var,spidev";
 		spi-max-frequency = <12000000>;
-		status = "okay";
+		status = "disabled";
 	};
 };
 
@@ -737,6 +757,7 @@
 			MX8MM_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK		0x13
 			MX8MM_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI		0x13
 			MX8MM_IOMUXC_ECSPI1_MISO_ECSPI1_MISO		0x13
+			MX8MM_IOMUXC_ECSPI1_SS0_GPIO5_IO9		0x13
 			MX8MM_IOMUXC_GPIO1_IO14_GPIO1_IO14		0x13
 			MX8MM_IOMUXC_GPIO1_IO00_GPIO1_IO0		0x13
 		>;
@@ -749,9 +770,9 @@
 		>;
 	};
 
-	pinctrl_restouch: restouchgrp {
+	pinctrl_can_u25: canu25grp {
 		fsl,pins = <
-			MX8MM_IOMUXC_GPIO1_IO03_GPIO1_IO3		0x1c0
+			MX8MM_IOMUXC_SAI1_TXC_GPIO4_IO11		0x1c0
 		>;
 	};
 };
