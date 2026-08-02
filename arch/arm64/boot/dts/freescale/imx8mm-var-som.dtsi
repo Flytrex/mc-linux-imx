@@ -13,12 +13,13 @@
 
 / {
 	compatible = "variscite,imx8mm-var-som", "fsl,imx8mm";
-	iw612_pwrseq: iw612_pwrseq {
+	brcmf_pwrseq: brcmf_pwrseq {
 		compatible = "mmc-pwrseq-simple";
 		post-power-on-delay-ms = <100>;
 		power-off-delay-us = <10000>;
-		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>,	/* WIFI_RESET */
-			      <&gpio2 20 GPIO_ACTIVE_LOW>;	/* WIFI_PWR_EN */
+		reset-gpios = <&gpio2 7  GPIO_ACTIVE_LOW>,	/* WIFI_3V3_PWR_EN */
+			      <&gpio2 20 GPIO_ACTIVE_LOW>,	/* WIFI_1V8_PWR_EN */
+			      <&gpio2 10 GPIO_ACTIVE_LOW>;	/* WIFI_REG_ON     */
 		status = "okay";
 	};
 
@@ -105,6 +106,13 @@
 		#clock-cells = <0>;
 		clock-frequency = <40000000>;
 		clock-output-names = "can_osc";
+	};
+
+	can_u25_osc: can_u25_osc {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <40000000>;
+		clock-output-names = "can_u25_osc";
 	};
 };
 
@@ -417,8 +425,13 @@
 	bus-width = <4>;
 	non-removable;
 	keep-power-in-suspend;
-	mmc-pwrseq = <&iw612_pwrseq>;
+	mmc-pwrseq = <&brcmf_pwrseq>;
 	status = "okay";
+
+	brcmf: wifi@1 {
+		reg = <1>;
+		compatible = "brcm,bcm4329-fmac";
+	};
 };
 
 /* EMMC */
@@ -453,37 +466,24 @@
 &ecspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi1>;
-	cs-gpios = <&gpio1 14 GPIO_ACTIVE_LOW>,
-		   <&gpio1  0 GPIO_ACTIVE_LOW>,
-		   <&gpio2 19 GPIO_ACTIVE_LOW>;
+	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>,
+		   <&gpio1 0 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
-	/* Resistive touch controller */
-	ads7846@0 {
+	/* CAN controller(Blue[u25]) */
+	can_u25: can@0 {
 		reg = <0>;
-		compatible = "ti,ads7846";
+		compatible = "microchip,mcp251xfd";
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_restouch>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
-		spi-max-frequency = <1500000>;
-		pendown-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
-		ti,x-min = /bits/ 16 <125>;
-		ti,x-max = /bits/ 16 <4008>;
-		ti,y-min = /bits/ 16 <282>;
-		ti,y-max = /bits/ 16 <3864>;
-		ti,x-plate-ohms = /bits/ 16 <180>;
-		ti,pressure-max = /bits/ 16 <255>;
-		ti,debounce-max = /bits/ 16 <10>;
-		ti,debounce-tol = /bits/ 16 <3>;
-		ti,debounce-rep = /bits/ 16 <1>;
-		ti,settle-delay-usec = /bits/ 16 <150>;
-		ti,keep-vref-on;
-		wakeup-source;
+		pinctrl-0 = <&pinctrl_can_u25>;
+		clocks = <&can_u25_osc>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
+		spi-max-frequency = <20000000>;
 		status = "okay";
 	};
 
-	/* CAN controller */
+	/* CAN controller(Red) */
 	can0: can@1 {
 		reg = <1>;
 		compatible = "microchip,mcp251xfd";
@@ -504,7 +504,7 @@
 		reg = <2>;
 		compatible = "var,spidev";
 		spi-max-frequency = <12000000>;
-		status = "okay";
+		status = "disabled";
 	};
 };
 
@@ -740,6 +740,7 @@
 
 	pinctrl_wifi: wifigrp {
 		fsl,pins = <
+			MX8MM_IOMUXC_SD1_DATA5_GPIO2_IO7		0xc1	/* WIFI_3V3_PWR_EN */
 			MX8MM_IOMUXC_SD2_WP_GPIO2_IO20			0x140	/* WIFI_1V8_PWR_EN */
 			MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10		0xc1	/* WIFI_REG_ON     */
 		>;
@@ -756,9 +757,9 @@
 			MX8MM_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK		0x13
 			MX8MM_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI		0x13
 			MX8MM_IOMUXC_ECSPI1_MISO_ECSPI1_MISO		0x13
+			MX8MM_IOMUXC_ECSPI1_SS0_GPIO5_IO9		0x13
 			MX8MM_IOMUXC_GPIO1_IO14_GPIO1_IO14		0x13
 			MX8MM_IOMUXC_GPIO1_IO00_GPIO1_IO0		0x13
-			MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19		0x13
 		>;
 	};
 
@@ -769,9 +770,9 @@
 		>;
 	};
 
-	pinctrl_restouch: restouchgrp {
+	pinctrl_can_u25: canu25grp {
 		fsl,pins = <
-			MX8MM_IOMUXC_GPIO1_IO03_GPIO1_IO3		0x1c0
+			MX8MM_IOMUXC_SAI1_TXC_GPIO4_IO11		0x1c0
 		>;
 	};
 };
