@@ -13,6 +13,7 @@
 		stdout-path = &uart4;
 	};
 
+	/*
 	backlight: backlight {
 		compatible = "pwm-backlight";
 		pwms = <&pwm1 0 1000000 0>;
@@ -30,6 +31,7 @@
 		default-brightness-level = <80>;
 		status = "okay";
 	};
+	*/
 
 	gpio-keys {
 		compatible = "gpio-keys";
@@ -211,7 +213,8 @@
 		touchscreen-inverted-x;
 		touchscreen-inverted-y;
 		wakeup-source;
-		status = "okay";
+		/* SPDIF_RX (GPIO5_IO4) is used as PWM2 on Flytrex board */
+		status = "disabled";
 	};
 
 	/* DS1337 RTC module */
@@ -271,7 +274,7 @@
 	data-mapping = "jeida-24";
 	width-mm = <154>;
 	height-mm = <87>;
-	backlight = <&backlight>;
+	/* backlight = <&backlight>; - pwm1 is used by Flytrex board */
 
 	panel-timing {
 		clock-frequency = <33000000>;
