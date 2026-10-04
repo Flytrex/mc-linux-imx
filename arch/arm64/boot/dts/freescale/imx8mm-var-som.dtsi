@@ -13,13 +13,12 @@
 
 / {
 	compatible = "variscite,imx8mm-var-som", "fsl,imx8mm";
-	brcmf_pwrseq: brcmf_pwrseq {
+	iw612_pwrseq: iw612_pwrseq {
 		compatible = "mmc-pwrseq-simple";
 		post-power-on-delay-ms = <100>;
 		power-off-delay-us = <10000>;
-		reset-gpios = <&gpio2 7  GPIO_ACTIVE_LOW>,	/* WIFI_3V3_PWR_EN */
-			      <&gpio2 20 GPIO_ACTIVE_LOW>,	/* WIFI_1V8_PWR_EN */
-			      <&gpio2 10 GPIO_ACTIVE_LOW>;	/* WIFI_REG_ON     */
+		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>,	/* WIFI_RESET */
+			      <&gpio2 20 GPIO_ACTIVE_LOW>;	/* WIFI_PWR_EN */
 		status = "okay";
 	};
 
@@ -406,7 +405,8 @@
 	assigned-clocks = <&clk IMX8MM_CLK_UART2>;
 	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
 	uart-has-rtscts;
-	status = "okay";
+	/* Bluetooth is not used on Flytrex boards, keep it off on all SOM revisions */
+	status = "disabled";
 
 	bluetooth_iw61x: bluetooth_iw61x {
 		compatible = "nxp,88w8987-bt";
@@ -425,13 +425,8 @@
 	bus-width = <4>;
 	non-removable;
 	keep-power-in-suspend;
-	mmc-pwrseq = <&brcmf_pwrseq>;
+	mmc-pwrseq = <&iw612_pwrseq>;
 	status = "okay";
-
-	brcmf: wifi@1 {
-		reg = <1>;
-		compatible = "brcm,bcm4329-fmac";
-	};
 };
 
 /* EMMC */
@@ -740,7 +735,6 @@
 
 	pinctrl_wifi: wifigrp {
 		fsl,pins = <
-			MX8MM_IOMUXC_SD1_DATA5_GPIO2_IO7		0xc1	/* WIFI_3V3_PWR_EN */
 			MX8MM_IOMUXC_SD2_WP_GPIO2_IO20			0x140	/* WIFI_1V8_PWR_EN */
 			MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10		0xc1	/* WIFI_REG_ON     */
 		>;
