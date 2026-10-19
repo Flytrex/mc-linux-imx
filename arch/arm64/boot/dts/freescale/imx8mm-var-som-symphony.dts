@@ -414,6 +414,14 @@
 	status = "okay";
 };
 
+/*
+ * SKY II has no Ethernet connector: the SOM's PHY is not wired anywhere. With the MAC off, its
+ * PHY regulator has no consumer left and the kernel switches it off after boot.
+ */
+&fec1 {
+	status = "disabled";
+};
+
 /* SKY II: the RGB LED */
 &gpio1 {
 	gpio-line-names = "", "", "", "", "", "", "", "",
